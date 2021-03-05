@@ -2,23 +2,43 @@
    
 include('config/db_connection.php');
 
-$email = $_POST['email'];
-$password = $_POST['password'];
+$email = $_POST['login-email'];
+$password = $_POST['login-pass'];
+$name = $_POST['login-name'];
 
-$sql = mysqli_query($con, "SELECT * FROM users WHERE email='$email' and password='$password'");
-
-$row = mysqli_fetch_array($sql);
-
-
-if(is_array($row)){
-    //user exists
-    header('Location: success.php');
-
-} else {
-    print_r('User doesnt exist');
-}
+$sql =  "SELECT * FROM users WHERE name = '$name' ";
+$result = mysqli_query($con, $sql);
+$users = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
 
+
+
+if(isset($_POST[ 'login-submit' ])){
+
+
+//checks if user exists and then checks its password
+ foreach($users as $user){
+
+     if($user['name'] == true){
+       print_r($user['name'] . ' ' . 'FUCKING EXISTS!!!');
+     } 
+
+     if($user['password'] === $password){
+       print_r('prawidlowe haslo');
+     } else {
+       print_r('złe hasło!');
+     }
+  }
+  
+    //checks if user doesnt exists
+    if(mysqli_num_rows($result) == 0){
+      echo 'nie istnieje';
+  }
+
+};
+
+
+mysqli_free_result($result);
 mysqli_close($con);
 
 
@@ -30,32 +50,35 @@ mysqli_close($con);
 
 <?php include( 'templates/header.php' ); ?>
 
-
-    <div class="container d-flex">
-        <div class="form-wrapper">
+<div class="login-form-wrapper">
         
         
     <h2>Login</h2> 
-    <form class="form" action="login.php" method="POST">
-        <div class="form-group">
-            <label>E-mail:</label>
-            <input type="email" class="form-control" name="email" value="<?php echo htmlspecialchars($_POST['email']); ?>"> 
-            <div class="invalid-feedback">Please provide Your e-mail</div> 
-        </div>      
-        <div class="form-group">
-            <label>Password:</label>
-            <input type="password" class="form-control" name="password" value="<?php echo htmlspecialchars($_POST['password']); ?>">
-            <div class="invalid-feedback">Please provide Your password</div>
-        </div>
-
-        <a class="link" href="index.php"><button type="button" class="btn sec inform btn-sm position-relative" >Cancel</button></a>
-        <a class="link" ><button type="submit" name="submit" class="btn prim inform btn-sm position-relative">Login</button></a>
-    </form>
-
-        </div>
-    </div>      
-
-
-       
-<?php include( 'templates/footer.php' ); ?>
+   
+        <form action="login.php" class="px-4 py-3" method="POST">
+          <div class="mb-3">
+            <label for="exampleDropdownFormEmail1" class="form-label">Email address</label>
+            <input type="text" class="form-control" name="login-name"  placeholder="Your e-mail" value="<?php echo $name ?>">
+            
+          </div>
+          <div class="mb-3">
+            <label for="exampleDropdownFormPassword1" class="form-label">Password</label>
+            <input type="password" class="form-control" name="login-pass"  placeholder="Password" value="<?php echo $password ?>">
+          </div>
+          <div class="mb-3">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="dropdownCheck">
+              <label class="form-check-label" for="dropdownCheck">
+                Remember me
+              </label>
+            </div>
+          </div>
+          <input type="submit" name="login-submit" value="submit" class="btn btn-primary" id="login-submit">
+        </form>
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item" href="#">New around here? Sign up</a>
+        <a class="dropdown-item" href="#">Forgot password?</a>
+    
+</div>
+</body>
 </html>
