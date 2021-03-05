@@ -4,16 +4,64 @@ include('config/db_connection.php');
 
 $username = $_POST['username'];
 $password = $_POST['password'];
+$hashed_password = password_hash($password, PASSWORD_BCRYPT);
 $email = $_POST['email'];
 
 
-$sql = "INSERT INTO users(name, email, password) VALUES ( '$username', '$password', '$email')";
-mysqli_query($con, $sql);
 
+
+$error = array(
+    'name' => '',
+    'password' => '',
+    'email' => ''
+);
 
 if(isset($_POST['submit'])){
-    Header('Location: success.php');
-}
+    
+    //check name
+    if(empty($_POST['username'])){
+        echo 'A name is required <br />';
+    } else { 
+        if(!preg_match('/^[a-zA-Z\s]+$/', $username)){
+            echo 'name must be a letters and spaces only';
+        }
+    }
+
+    //check email
+    if(empty($_POST['email'])){
+        echo 'An e-mail is required <br />';
+        } else { 
+            if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+                $error['email'] = 'an E-mail must be a valid e-mail address';
+            }
+    }
+
+
+    //check password
+    if(empty($_POST['password'])){
+         echo 'A password is required <br />';
+    } else {
+        echo 'chyba git';
+    }
+    
+ 
+        $sql = "INSERT INTO users(name, email, password) VALUES ( '$username', '$email', '$hashed_password')";
+        mysqli_query($con, $sql);
+
+       
+        //end of POST check
+
+        
+        
+    
+}   
+
+  
+    
+    
+    
+
+mysqli_close($con);
 
 ?>
 
@@ -31,20 +79,24 @@ if(isset($_POST['submit'])){
   <h2>It's time to register!</h2> 
   <form class="form" action="signup.php" method="POST">
       <div class="form-group">
-          <label>Your Login:</label>
+          <label>Your Name</label>
           <input type="text" class="form-control" name="username" value="<?php echo htmlspecialchars($_POST['username']); ?>">
           <div class="invalid-feedback">Please provide Your Login</div>
-      </div>
-      <div class="form-group">
-          <label>Your Password:</label>
-          <input type="password" class="form-control" name="password" value="<?php echo htmlspecialchars($_POST['password']); ?>">
-          <div class="invalid-feedback">Please provide Your password</div>
+          <div class="text-danger"><?php echo $error['name'] ;?></div>
       </div>
       <div class="form-group">
           <label>Your e-mail:</label>
           <input type="email" class="form-control" name="email" value="<?php echo htmlspecialchars($_POST['email']); ?>"> 
           <div class="invalid-feedback">Please provide Your e-mail</div> 
-      </div>              
+          <div class="text-danger"><?php echo $error['email'] ;?></div>
+      </div>   
+      <div class="form-group">
+          <label>Your Password:</label>
+          <input type="password" class="form-control" name="password" value="<?php echo htmlspecialchars($_POST['password']); ?>">
+          <div class="invalid-feedback">Please provide Your password</div>
+          <div class="text-danger"><?php echo $error['password'] ;?></div>
+      </div>
+              
 
       <a class="link" href="index.php"><button type="button" class="btn sec inform btn-sm position-relative" >Cancel</button></a>
       <a class="link" ><button type="submit" name="submit" class="btn prim inform btn-sm position-relative">Submit</button></a>
