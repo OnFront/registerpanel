@@ -23,7 +23,7 @@ if(isset($_POST['submit'])){
         echo 'A name is required <br />';
     } else { 
         if(!preg_match('/^[a-zA-Z\s]+$/', $username)){
-            echo 'name must be a letters and spaces only';
+            $error['name'] = 'name must be a letters and spaces only';
         }
     }
 
@@ -41,18 +41,25 @@ if(isset($_POST['submit'])){
     if(empty($_POST['password'])){
          echo 'A password is required <br />';
     } else {
-        echo 'chyba git';
+        if(!preg_match('/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[A-Z])(?=\S*[\d])\S*$/', $password)){
+            $error['password'] = 'Password has to contain at least 8 characters, at least one uppercase and lowercase letter, at least one number';
+        }
     }
-    
- 
+
+    if(array_filter($error)){
+        echo 'errors in the form';
+    } else {
+
         $sql = "INSERT INTO users(name, email, password) VALUES ( '$username', '$email', '$hashed_password')";
         mysqli_query($con, $sql);
 
-       
-        //end of POST check
-
-        
-        
+       if(mysqli_query($con, $sql)){
+           header('Location: success.php');
+       }
+    }
+    
+    
+     //end of POST check
     
 }   
 
