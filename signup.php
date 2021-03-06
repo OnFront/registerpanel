@@ -19,7 +19,7 @@ $error = array(
 if(isset($_POST['submit'])){
     
     //check name
-    if(empty($_POST['username'])){
+    if(empty($username)){
         echo 'A name is required <br />';
     } else { 
         if(!preg_match('/^[a-zA-Z\s]+$/', $username)){
@@ -28,7 +28,7 @@ if(isset($_POST['submit'])){
     }
 
     //check email
-    if(empty($_POST['email'])){
+    if(empty($email)){
         echo 'An e-mail is required <br />';
         } else { 
             if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
@@ -38,7 +38,7 @@ if(isset($_POST['submit'])){
 
 
     //check password
-    if(empty($_POST['password'])){
+    if(empty($password)){
          echo 'A password is required <br />';
     } else {
         if(!preg_match('/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[A-Z])(?=\S*[\d])\S*$/', $password)){
@@ -49,9 +49,9 @@ if(isset($_POST['submit'])){
     if(array_filter($error)){
         echo 'errors in the form';
     } else {
-
+        
         $sql = "INSERT INTO users(name, email, password) VALUES ( '$username', '$email', '$hashed_password')";
-        mysqli_query($con, $sql);
+      
 
        if(mysqli_query($con, $sql)){
            header('Location: success.php');
