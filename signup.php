@@ -1,12 +1,17 @@
 <?php
 include('config/db_connection.php');
 
+    //select all data from table USERS
+    $sql = 'SELECT id, name, email, password FROM users ORDER BY created_at';
+    //sending query to the table USERS
+    $result = mysqli_query($con, $sql);
+    //displaying results from the table
+    $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
 $username = $_POST['username'];
 $password = $_POST['password'];
 $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 $email = $_POST['email'];
-
 
 
 
@@ -21,7 +26,8 @@ if(isset($_POST['submit'])){
     //check name
     if(empty($username)){
         echo 'A name is required <br />';
-    } else { 
+    } else {
+    
         if(!preg_match('/^[a-zA-Z\s]+$/', $username)){
             $error['name'] = 'name must be a letters and spaces only';
         }
@@ -34,6 +40,23 @@ if(isset($_POST['submit'])){
             if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
                 $error['email'] = 'an E-mail must be a valid e-mail address';
             }
+
+
+             //checks if email is taken
+        
+            $sql2 = "SELECT * FROM users WHERE email = '$email'";
+            $result2 = mysqli_query($con, $sql2);
+            $checked_email = mysqli_fetch_row($result2);
+           
+            if(mysqli_num_rows($result2) > 0){
+                $error['email'] = 'Sorry, this email is already taken.';
+            }
+ 
+            mysqli_free_result($result2);
+            
+        }
+
+  
     }
 
 
@@ -56,12 +79,9 @@ if(isset($_POST['submit'])){
        if(mysqli_query($con, $sql)){
            header('Location: success.php');
        }
-    }
-    
-    
-     //end of POST check
-    
-}   
+    } //end of POST check 
+     
+ 
 
   
     
