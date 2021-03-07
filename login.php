@@ -2,40 +2,33 @@
    
 include('config/db_connection.php');
 
-$email = $_POST['login-email'];
-$password = $_POST['login-pass'];
-$name = $_POST['login-name'];
+$email = mysqli_real_escape_string($con, $_POST['login-email']);
+$password = mysqli_real_escape_string($con, $_POST['login-pass']);
+
+$name = mysqli_real_escape_string($con, $_POST['login-name']);
 
 $sql =  "SELECT * FROM users WHERE name = '$name' ";
 $result = mysqli_query($con, $sql);
-$users = mysqli_fetch_all($result, MYSQLI_ASSOC);
-
-
+$user = mysqli_fetch_row($result);
 
 
 if(isset($_POST[ 'login-submit' ])){
 
+//checks if user exists 
 
-//checks if user exists and then checks its password
- foreach($users as $user){
-
-     if($user['name'] == true){
-       print_r($user['name'] . ' ' . 'FUCKING EXISTS!!!');
-     } 
-
-     if($user['password'] === $password){
-       print_r('prawidlowe haslo');
-     } else {
-       print_r('złe hasło!');
-     }
-  }
+  if(mysqli_num_rows($result) > 0){
   
-    //checks if user doesnt exists
-    if(mysqli_num_rows($result) == 0){
-      echo 'nie istnieje';
+    //and then checks its password
+    if(password_verify($password, $user[3])){
+      
+    } else {
+      $error['password'] = 'Wrong password.';
+    }
+  
+    } else {
+      $error['name'] = 'User does not exist';
+    }
   }
-
-};
 
 
 mysqli_free_result($result);
@@ -58,12 +51,13 @@ mysqli_close($con);
         <form action="login.php" class="px-4 py-3" method="POST">
           <div class="mb-3">
             <label for="exampleDropdownFormEmail1" class="form-label">Email address</label>
-            <input type="text" class="form-control" name="login-name"  placeholder="Your e-mail" value="<?php echo $name ?>">
-            
+            <input type="text" class="form-control" name="login-name"  placeholder="Your e-mail" value="<?php echo htmlspecialchars($name) ?>">
+            <div class="text-danger"><?php echo $error['name'] ;?></div>
           </div>
           <div class="mb-3">
             <label for="exampleDropdownFormPassword1" class="form-label">Password</label>
-            <input type="password" class="form-control" name="login-pass"  placeholder="Password" value="<?php echo $password ?>">
+            <input type="password" class="form-control" name="login-pass"  placeholder="Password" value="<?php echo htmlspecialchars($password) ?>">
+            <div class="text-danger"><?php echo $error['password'] ;?></div>
           </div>
           <div class="mb-3">
             <div class="form-check">
